@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  AUTHOR
+  CLIENT
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  nombre          String
+  apellidoPaterno String   @map("apellido_paterno")
+  apellidoMaterno String   @map("apellido_materno")
+  email           String   @unique
+  password        String
+  role            Role     @default(CLIENT)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relaciones
+  purchases Purchase[]
+  comments  Comment[]
+  Rating    Rating[]
+
+  @@map("user")
+}
+
+model Author {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  bio       String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relaciones
+  books Book[]
+
+  @@map("autor")
+}
+
+model Book {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  coverUrl    String   @map("cover_url")
+  pdfUrl      String   @map("pdf_url")
+  epubUrl     String   @map("epub_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relaciones
+  authorId  Int
+  author    Author     @relation(fields: [authorId], references: [id])
+  purchases Purchase[]
+  comments  Comment[]
+  ratings   Rating[]
+
+  @@map("book")
+}
+
+model Purchase {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relaciones
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
+
+  bookId Int  @map("book_id")
+  book   Book @relation(fields: [bookId], references: [id])
+
+  @@map("purchase")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relaciones
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
+
+  bookId Int  @map("book_id")
+  book   Book @relation(fields: [bookId], references: [id])
+
+  @@map("comment")
+}
+
+model Rating {
+  id        Int      @id @default(autoincrement())
+  value     Int // 1 a 5
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relaciones
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
+
+  bookId Int  @map("book_id")
+  book   Book @relation(fields: [bookId], references: [id])
+
+  @@map("rating")
+}
