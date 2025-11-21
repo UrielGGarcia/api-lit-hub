@@ -8,105 +8,153 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
+// ---------------------------------------------
+//  ENUMS
+// ---------------------------------------------
+enum Roles {
   ADMIN
   AUTHOR
   CLIENT
 }
 
-model User {
-  id              Int      @id @default(autoincrement())
-  nombre          String
-  apellidoPaterno String   @map("apellido_paterno")
-  apellidoMaterno String   @map("apellido_materno")
-  email           String   @unique
-  password        String
-  role            Role     @default(CLIENT)
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
-
-  // Relaciones
-  purchases Purchase[]
-  comments  Comment[]
-  Rating    Rating[]
-
-  @@map("user")
+enum FileTypes {
+  EPUB
+  PDF
+  COVER
 }
 
-model Author {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  bio       String?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+enum PurchaseStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  rol             Roles    @default(CLIENT)
+  nombre          String
+  apellidoPaterno String
+  apellidoMaterno String?
+  email           String   @unique
+  password        String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Relaciones
-  books Book[]
+  books     Book[]     @relation("AuthorBooks")
+  ratings   Rating[]
+  comments  Comment[]
+  purchases Purchase[]
+  userBooks UserBook[]
 
-  @@map("autor")
 }
 
 model Book {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  coverUrl    String   @map("cover_url")
-  pdfUrl      String   @map("pdf_url")
-  epubUrl     String   @map("epub_url")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id       Int     @id @default(autoincrement())
+  title    String
+  sinopsis String
+  price    Decimal @db.Decimal(10, 2)
+  idioma   String
+
+  published Boolean @default(false)
+  hasCover  Boolean @default(false)
+  hasPdf    Boolean @default(false)
+  hasEpub   Boolean @default(false)
+
+  stripeProductId String?
+  stripePriceId   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relación con autor
+  authorId Int
+  author   User @relation("AuthorBooks", fields: [authorId], references: [id], onDelete: Cascade)
 
   // Relaciones
-  authorId  Int
-  author    Author     @relation(fields: [authorId], references: [id])
-  purchases Purchase[]
-  comments  Comment[]
+  files     File[]
   ratings   Rating[]
+  comments  Comment[]
+  purchases Purchase[]
+  genres    Genre[]    @relation("BookGenres")
+  userBooks UserBook[]
 
-  @@map("book")
 }
 
-model Purchase {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now()) @map("created_at")
+model Genre {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  books Book[] @relation("BookGenres")
+}
 
-  // Relaciones
-  userId Int  @map("user_id")
-  user   User @relation(fields: [userId], references: [id])
+model File {
+  id       Int       @id @default(autoincrement())
+  name     String
+  fileType FileTypes
+  mimeType String
+  urlFile  String
+  bookId   Int?
+  book     Book?     @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
-  bookId Int  @map("book_id")
-  book   Book @relation(fields: [bookId], references: [id])
+  // Evita archivos duplicados del mismo tipo por libro
+  @@unique([bookId, fileType])
+}
 
-  @@map("purchase")
+model Rating {
+  id     Int @id @default(autoincrement())
+  value  Int
+  userId Int
+  bookId Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  // Cada usuario puede calificar un libro solo una vez
+  @@unique([userId, bookId])
 }
 
 model Comment {
   id        Int      @id @default(autoincrement())
   content   String
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now())
+  userId    Int
+  bookId    Int
 
-  // Relaciones
-  userId Int  @map("user_id")
-  user   User @relation(fields: [userId], references: [id])
-
-  bookId Int  @map("book_id")
-  book   Book @relation(fields: [bookId], references: [id])
-
-  @@map("comment")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
 }
 
-model Rating {
+model Purchase {
+  id              Int            @id @default(autoincrement())
+  purchaseDate    DateTime       @default(now())
+  priceAtPurchase Decimal        @db.Decimal(10, 2)
+  userId          Int
+  bookId          Int
+  status          PurchaseStatus @default(PAID)
+
+  stripeSessionId       String?
+  stripePaymentIntentId String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  // Evita compras duplicadas del mismo libro por usuario
+  @@unique([userId, bookId])
+
+  // Evita que el mismo libro se inserte dos veces con la misma sesión
+  @@unique([stripeSessionId, bookId])
+}
+
+
+model UserBook {
   id        Int      @id @default(autoincrement())
-  value     Int // 1 a 5
-  createdAt DateTime @default(now()) @map("created_at")
+  userId    Int
+  bookId    Int
+  createdAt DateTime @default(now())
 
-  // Relaciones
-  userId Int  @map("user_id")
-  user   User @relation(fields: [userId], references: [id])
+  user   User  @relation(fields: [userId], references: [id])
+  book   Book  @relation(fields: [bookId], references: [id])
 
-  bookId Int  @map("book_id")
-  book   Book @relation(fields: [bookId], references: [id])
-
-  @@map("rating")
+  @@unique([userId, bookId])
 }
+

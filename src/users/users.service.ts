@@ -1,16 +1,27 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import * as bcrypt from 'bcrypt';
+import { Prisma } from 'generated/prisma';
 
 @Injectable()
 export class UsersService {
 
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+    ) { }
 
     async getUsers() {
         try {
-            const users = await this.prisma.user.findMany();
+            const users = await this.prisma.user.findMany({
+                select: {
+                    id: true,
+                    nombre: true,
+                    apellidoMaterno: true,
+                    apellidoPaterno: true,
+                    email: true,
+                    createdAt: true,
+                    updatedAt: true,
+                }
+            });
             return users;
 
         } catch (error) {
@@ -20,46 +31,79 @@ export class UsersService {
         }
     }
 
-    // Agregar get por usuario individual
-
-    async createUser(user: CreateUserDto) {
+    async getAuthors() {
         try {
-            const existEmail = await this.prisma.user.findUnique({
+            const author = await this.prisma.user.findMany({
                 where: {
-                    email: user.email,
+                    rol: "AUTHOR",
+                },
+                select: {
+                    id: true,
+                    nombre: true,
+                    email: true,
+                    apellidoPaterno: true,
+                    apellidoMaterno: true,
                 }
             });
-
-            if (existEmail) {
-                return `Èl correo ${user.email} ya está asociado a una cuenta.`;
-            }
-
-            const saltRounds = 10;
-            const hashedPassword = await bcrypt.hash(user.password, saltRounds);
-
-            const newUser = await this.prisma.user.create({
-                data: {
-                    nombre: user.nombre,
-                    apellidoPaterno: user.apellidoPaterno,
-                    apellidoMaterno: user.apellidoMaterno,
-                    email: user.email,
-                    role: user.role,
-                    password: hashedPassword,
-                }
-            });
-
-            const payLoad = {
-                usuario: newUser.email,
-                rol: newUser.role,
-            }
-
-            return payLoad;
+            return author;
 
         } catch (error) {
+
+            if (error instanceof NotFoundException) {
+                throw new NotFoundException(error.message);
+            }
             if (error instanceof Error) {
                 throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
+    }
+
+    async getUser(id: number) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id
+                }
+            });
+
+            if (user) return ({ "Nombre": user.nombre, "Email": user.email })
+            throw new NotFoundException(`El usuario con id : ${id} no fue encontrado.`)
+
+        } catch (error) {
+            if (error instanceof NotFoundException)
+                throw new NotFoundException(error.message)
+            if (error instanceof Error)
+                throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+
+
+    async deleteUser(id: number) {
+        try {
+            const deletedUser = await this.prisma.user.delete({
+                where: {
+                    id
+                }
+            });
+
+
+            if (deletedUser) {
+                return `El usuario con email ${deletedUser.email} fue eliminado correctamente.`;
+            }
+
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+                throw new NotFoundException(`El usuario con id ${id} no fue encontrado.`);
+            }
+            if (error instanceof NotFoundException) {
+                throw new NotFoundException(error.message);
+            }
+            if (error instanceof Error) {
+                throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+
     }
 
 }
