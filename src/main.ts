@@ -9,15 +9,13 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Seguridad
+  app.use(helmet());
 
   // CORS
   app.enableCors({
-    origin:
-      process.env.NODE_ENV === 'production'
-        ? process.env.CLIENT_URL?.split(',') // Soporta varias también
-        : ['http://localhost:3000', 'http://192.168.100.10:3000'],
-    credentials: true,
+    origin: '*',
   });
+
 
 
   // Webhook STRIPE
