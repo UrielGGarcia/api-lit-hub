@@ -5,8 +5,6 @@ import { FilesModule } from './files/files.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { GenresModule } from './genres/genres.module';
-import { RatingsModule } from './ratings/ratings.module';
-import { CommentsModule } from './comments/comments.module';
 import { PurchasesModule } from './purchases/purchases.module';
 import { AuthModule } from './auth/auth.module';
 import { StripeModule } from './stripe/stripe.module';
@@ -22,11 +20,10 @@ import { StripeModule } from './stripe/stripe.module';
       serveRoot: '/uploads/books/covers',
     }),
     GenresModule,
-    RatingsModule,
-    CommentsModule,
     PurchasesModule,
     AuthModule,
     StripeModule,
+    
   ],
 
   controllers: [],

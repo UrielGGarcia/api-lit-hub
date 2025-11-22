@@ -14,11 +14,6 @@ export class StripeController {
         return await this.stripeService.createDynamicProduct(body);
     }
 
-    @Post("/checkout-session")
-    async createCheckOutSession(@Body() data: CreateCheckoutDto) {
-        return await this.stripeService.createCheckoutSession(data);
-    }
-
     // stripe.controller.ts
     @Post('/checkout-session/cart')
     async createCartCheckout(

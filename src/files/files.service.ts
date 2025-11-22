@@ -9,6 +9,26 @@ import { StripeService } from 'src/stripe/stripe.service';
 export class FilesService {
     constructor(private prismaService: PrismaService, private readonly stripeService: StripeService) { }
 
+    async checkBookOwnership(userId: number, bookId: number): Promise<boolean> {
+        const book = await this.prismaService.book.findUnique({
+            where: { id: bookId },
+            select: { authorId: true },
+        });
+        return book?.authorId === userId;
+    }
+
+    async checkFileOwnership(userId: number, fileId: number): Promise<boolean> {
+    const file = await this.prismaService.file.findUnique({
+        where: { id: fileId },
+        include: { book: true },
+    });
+
+    if (!file || !file.book) return false; // archivo o libro no existen
+
+    return file.book.authorId === userId;
+}
+
+
 
     async getFiles() {
         try {

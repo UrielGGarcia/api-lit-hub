@@ -38,60 +38,6 @@ export class StripeService {
     }
 
 
-    async createCheckoutSession(data: CreateCheckoutDto) {
-        // 1. Buscar libro y usuario
-        const book = await this.prismaService.book.findUnique({
-            where: { id: data.bookId },
-        });
-
-        const user = await this.prismaService.user.findUnique({
-            where: { id: data.userId },
-        });
-
-        if (!book) throw new Error('Book not found');
-        if (!user) throw new Error('User not found');
-        if (!book.stripePriceId) throw new Error('Book does not have a stripePriceId');
-
-        // 2. Validar si ya fue comprado por este usuario
-        const existingPurchase = await this.prismaService.purchase.findUnique({
-            where: {
-                userId_bookId: {
-                    userId: user.id,
-                    bookId: book.id,
-                },
-            },
-        });
-
-        if (existingPurchase && existingPurchase.status === 'PAID') {
-            throw new Error('Este libro ya fue comprado por este usuario');
-        }
-
-        // 3. Crear sesión de Stripe
-        const session = await this.instance.checkout.sessions.create({
-            mode: 'payment',
-            payment_method_types: ['card'],
-            line_items: [
-                {
-                    price: book.stripePriceId,
-                    quantity: 1,
-                },
-            ],
-            customer_email: data.userEmail ?? undefined,
-            success_url: `https://example.com/payment/success`,
-            cancel_url: `https://example.com/payment/cancel`,
-            metadata: {
-                userId: String(user.id),
-                bookId: String(book.id),
-            },
-        });
-
-        // 4. Regresar URL al frontend
-        return { url: session.url };
-    }
-
-
-
-
     async createCartCheckoutSession(data: CreateCheckoutCartDto) {
 
         // 1. Validar usuario
@@ -148,7 +94,7 @@ export class StripeService {
                 throw new Error(`You already own the book: ${book.title}`);
             }
 
-            // ✅ SIEMPRE quantity = 1 para e-books
+            // SIEMPRE quantity = 1 para e-books
             lineItems.push({
                 price: book.stripePriceId,
                 quantity: 1
@@ -164,8 +110,9 @@ export class StripeService {
             line_items: lineItems,
             customer_email: data.userEmail ?? undefined,
 
-            success_url: `http://localhost:3000/biblioteca`,
-            cancel_url: `http://localhost:5173/payment/error`,
+            success_url: `${process.env.FRONTEND_URL}/payment/success`,
+            cancel_url: `${process.env.FRONTEND_URL}/payment/cancel`,
+
 
             metadata: {
                 userId: data.userId.toString(),

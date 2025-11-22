@@ -18,6 +18,7 @@ export class UsersService {
                     apellidoMaterno: true,
                     apellidoPaterno: true,
                     email: true,
+                    rol: true,
                     createdAt: true,
                     updatedAt: true,
                 }
@@ -89,7 +90,7 @@ export class UsersService {
 
 
             if (deletedUser) {
-                return `El usuario con email ${deletedUser.email} fue eliminado correctamente.`;
+                return { message: `El usuario con email ${deletedUser.email} fue eliminado correctamente.` };
             }
 
         } catch (error) {

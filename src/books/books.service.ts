@@ -38,7 +38,7 @@ export class BooksService {
                         select: {
                             id: true,
                             name: true,
-                            
+
                         },
                     },
                 },
@@ -88,6 +88,14 @@ export class BooksService {
             }
         }
     }
+
+    async getUserBooksByUserId(userId: number) {
+        return await this.prisma.userBook.findMany({
+            where: { userId },
+            select: { id: true, createdAt: true, bookId: true, userId: true }
+        });
+    }
+
 
     async getNoPublishedBooks() {
         try {
@@ -360,7 +368,7 @@ export class BooksService {
                 author: `${item.book.author.nombre} ${item.book.author.apellidoPaterno} ${item.book.author.apellidoMaterno}`,
 
                 cover: item.book.files.length
-                    ? `${item.book.files[0].name}` 
+                    ? `${item.book.files[0].name}`
                     : null,
             }));
 
@@ -379,9 +387,28 @@ export class BooksService {
         }
     }
 
-    async getBookIfUserOwnsIt(userId: number, bookId: number) {
+    async getBookIfUserOwnsIt(userId: number, bookId: number, isAdmin = false) {
         try {
-            const relation = await this.prisma.userBook.findFirst({
+            let relation;
+
+            if (isAdmin) {
+                // ADMIN: trae el libro directamente con el PDF
+                const book = await this.prisma.book.findUnique({
+                    where: { id: bookId },
+                    include: {
+                        files: {
+                            where: { fileType: 'PDF' },
+                        },
+                    },
+                });
+
+                if (!book || !book.files.length) return null;
+
+                return { fileName: book.files[0].name };
+            }
+
+            // Usuario normal: solo si tiene relación
+            relation = await this.prisma.userBook.findFirst({
                 where: { userId, bookId },
                 include: {
                     book: {
@@ -394,11 +421,9 @@ export class BooksService {
                 },
             });
 
-            if (!relation) return null;
+            if (!relation || !relation.book.files.length) return null;
 
-            return {
-                fileName: relation.book.files[0]?.name,
-            };
+            return { fileName: relation.book.files[0].name };
         } catch (error) {
             if (error instanceof Error) {
                 throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -46,7 +46,6 @@ model User {
   comments  Comment[]
   purchases Purchase[]
   userBooks UserBook[]
-
 }
 
 model Book {
@@ -78,7 +77,6 @@ model Book {
   purchases Purchase[]
   genres    Genre[]    @relation("BookGenres")
   userBooks UserBook[]
-
 }
 
 model Genre {
@@ -138,13 +136,9 @@ model Purchase {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
-  // Evita compras duplicadas del mismo libro por usuario
   @@unique([userId, bookId])
-
-  // Evita que el mismo libro se inserte dos veces con la misma sesión
   @@unique([stripeSessionId, bookId])
 }
-
 
 model UserBook {
   id        Int      @id @default(autoincrement())
@@ -152,9 +146,11 @@ model UserBook {
   bookId    Int
   createdAt DateTime @default(now())
 
-  user   User  @relation(fields: [userId], references: [id])
-  book   Book  @relation(fields: [bookId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
 
   @@unique([userId, bookId])
 }
+
+
 
