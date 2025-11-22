@@ -5,7 +5,7 @@ import { AuthDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { RolesAllowed } from './decorators/roles.decorator';
-import { Roles } from '@prisma/client';
+import { Roles } from '../common/enums';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 interface RequestWithUser extends Request {

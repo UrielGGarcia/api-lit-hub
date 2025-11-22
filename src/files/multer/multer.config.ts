@@ -3,7 +3,7 @@ import { diskStorage } from "multer";
 import { extname } from "path";
 import { allowedMimeTypesCover, allowedMimeTypesEpub, allowedMimeTypesPdf } from "./MimeTypes";
 import { BadRequestException, Type } from "@nestjs/common";
-import { FileTypes } from "@prisma/client";
+import { FileTypes } from "../../common/enums";
 
 
 export const generateSettings = (tipoArchivo: FileTypes): {} => {

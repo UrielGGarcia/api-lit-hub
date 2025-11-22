@@ -1,5 +1,5 @@
-import { BadRequestException, CanActivate, ExecutionContext, Injectable, NotFoundException } from "@nestjs/common";
-import { FileTypes } from "@prisma/client";
+import {  CanActivate, ExecutionContext, Injectable, NotFoundException } from "@nestjs/common";
+import { FileTypes } from "../../common/enums";
 import { PrismaService } from "src/prisma.service";
 
 @Injectable()

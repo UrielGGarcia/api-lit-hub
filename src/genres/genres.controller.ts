@@ -4,7 +4,7 @@ import { CreateGenreDto } from './dto/create-genre.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { RolesAllowed } from 'src/auth/decorators/roles.decorator';
-import { Roles } from '@prisma/client';
+import { Roles } from '../common/enums';
 import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 
 @ApiTags('Géneros')

@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException, ParseIntPipe } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { FileTypes, Prisma } from '@prisma/client';
+import { FileTypes } from '../common/enums';
+import { Prisma } from '@prisma/client';
 import * as path from 'path';
 import { promises as fs } from 'fs';
 import { StripeService } from 'src/stripe/stripe.service';
@@ -18,15 +19,15 @@ export class FilesService {
     }
 
     async checkFileOwnership(userId: number, fileId: number): Promise<boolean> {
-    const file = await this.prismaService.file.findUnique({
-        where: { id: fileId },
-        include: { book: true },
-    });
+        const file = await this.prismaService.file.findUnique({
+            where: { id: fileId },
+            include: { book: true },
+        });
 
-    if (!file || !file.book) return false; // archivo o libro no existen
+        if (!file || !file.book) return false; // archivo o libro no existen
 
-    return file.book.authorId === userId;
-}
+        return file.book.authorId === userId;
+    }
 
 
 
