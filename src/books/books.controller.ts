@@ -7,7 +7,7 @@ import { join } from 'path';
 import { Response } from 'express';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { RolesAllowed } from 'src/auth/decorators/roles.decorator';
-import { Roles } from 'generated/prisma';
+import { Roles } from '@prisma/client';
 
 @ApiTags('Books') // Agrupa todos los endpoints bajo "Books" en Swagger
 @Controller('books')

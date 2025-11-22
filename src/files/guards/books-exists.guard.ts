@@ -1,5 +1,5 @@
 import { BadRequestException, CanActivate, ExecutionContext, Injectable, NotFoundException } from "@nestjs/common";
-import { FileTypes } from "generated/prisma";
+import { FileTypes } from "@prisma/client";
 import { PrismaService } from "src/prisma.service";
 
 @Injectable()

@@ -1,6 +1,6 @@
 import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
-import { FileTypes } from "generated/prisma";
+import { FileTypes } from "@prisma/client";
 
 export class CreateFileDto {
 

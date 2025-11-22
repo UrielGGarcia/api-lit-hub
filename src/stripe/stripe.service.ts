@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Book } from 'generated/prisma';
-import { CreateBookDto } from 'src/books/dto/create-book.dto';
 import { PrismaService } from 'src/prisma.service';
 import Stripe from 'stripe';
-import { CreateCheckoutDto } from './dto/create-checkout-session.dto';
 import { CreateCheckoutCartDto } from './dto/create-checkout-session-cart';
 
 @Injectable()

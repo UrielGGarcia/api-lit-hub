@@ -1,6 +1,6 @@
 import { Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UploadedFile, UseGuards, UseInterceptors, Req, UnauthorizedException } from '@nestjs/common';
 import { FilesService } from './files.service';
-import { FileTypes, Roles } from 'generated/prisma';
+import { FileTypes, Roles } from '@prisma/client';
 import { BookExistsGuard } from './guards/books-exists.guard';
 import { DynamicFileInterceptor } from './interceptors/dynamic-file.interceptor';
 import { FileMatchGuard } from './guards/file-update.guard';

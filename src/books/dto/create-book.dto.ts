@@ -1,5 +1,4 @@
-import { IsDecimal, IsNotEmpty, IsNumber, IsString, MaxLength } from "class-validator";
-import { Decimal } from "generated/prisma/runtime/library";
+import { IsNotEmpty, IsNumber, IsString, MaxLength } from "class-validator";
 
 export class CreateBookDto {
 

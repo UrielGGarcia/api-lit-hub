@@ -1,8 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateGenreDto } from './dto/create-genre.dto';
-import { Genre, Prisma } from 'generated/prisma';
-import { isNotEmpty } from 'class-validator';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class GenresService {

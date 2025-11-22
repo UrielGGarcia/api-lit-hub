@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { AuthDto } from './dto/auth.dto';
-import { Prisma } from 'generated/prisma';
+import { Prisma } from '@prisma/client';
 
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';

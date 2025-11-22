@@ -1,6 +1,6 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor, Type, } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FileTypes } from 'generated/prisma';
+import { FileTypes } from '@prisma/client';
 import { generateSettings } from '../multer/multer.config';
 
 export function DynamicFileInterceptor(fieldName: string): Type<NestInterceptor> {
