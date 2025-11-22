@@ -15,7 +15,7 @@ async function bootstrap() {
     origin:
       process.env.NODE_ENV === 'production'
         ? [process.env.CLIENT_URL] // tu dominio de Vercel
-        : ['http://localhost:5173'], // tu Vite local
+        : ['http://localhost:5173', process.env.CLIENT_URL], // tu Vite local
     credentials: true,
   });
 
