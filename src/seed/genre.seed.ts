@@ -25,23 +25,13 @@ const genres = [
 async function main() {
   console.log('🌱 Iniciando seed de géneros...');
 
-  // Opción 1: createMany (más rápido si no te importa el orden)
   const result = await prisma.genre.createMany({
     data: genres.map((name) => ({ name })),
-    skipDuplicates: true, // importante por la constraint @unique en name
+    skipDuplicates: true, 
   });
 
   console.log(`✅ Se crearon/ignoraron ${result.count} géneros.`);
 
-  // Opción 2 (alternativa más segura con upsert, recomendado si quieres control total)
-  // for (const name of genres) {
-  //   await prisma.genre.upsert({
-  //     where: { name },
-  //     update: {},
-  //     create: { name },
-  //   });
-  // }
-  // console.log('✅ Todos los géneros están asegurados en la BD');
 }
 
 main()
