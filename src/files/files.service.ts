@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException, ParseIntPipe } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { FileTypes } from '../common/enums';
-import { PrismaClientKnownRequestError } from 'generated/prisma/runtime/library';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import * as path from 'path';
 import { promises as fs } from 'fs';
 import { StripeService } from 'src/stripe/stripe.service';
