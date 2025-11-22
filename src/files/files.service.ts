@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException, ParseIntPipe } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { FileTypes } from '../common/enums';
-import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from 'generated/prisma/runtime/library';
 import * as path from 'path';
 import { promises as fs } from 'fs';
 import { StripeService } from 'src/stripe/stripe.service';
@@ -208,7 +208,7 @@ export class FilesService {
             };
 
         } catch (error) {
-            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
                 throw new NotFoundException(`El usuario con id ${id} no fue encontrado.`);
             }
             if (error instanceof NotFoundException) {

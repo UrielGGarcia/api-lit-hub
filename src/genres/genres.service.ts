@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateGenreDto } from './dto/create-genre.dto';
-import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from 'generated/prisma/runtime/library';
 
 @Injectable()
 export class GenresService {
@@ -57,7 +57,7 @@ export class GenresService {
             }
 
         } catch (error) {
-            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
                 throw new NotFoundException(`El género con id ${id} no fue encontrado.`);
             }
             if (error instanceof NotFoundException) {

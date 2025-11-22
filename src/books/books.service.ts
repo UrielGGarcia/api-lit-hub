@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateBookDto } from './dto/create-book.dto';
-import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from 'generated/prisma/runtime/library';
 
 
 @Injectable()
@@ -173,7 +173,7 @@ export class BooksService {
             }));
 
         } catch (error) {
-            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
                 throw new NotFoundException(`El libro con id ${id} no fue encontrado.`);
             }
             if (error instanceof NotFoundException) {
@@ -212,7 +212,7 @@ export class BooksService {
             return newBook;
 
         } catch (error) {
-            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
                 throw new NotFoundException(`El usuario con id ${data.authorId} no fue encontrado.`);
             }
             if (error instanceof NotFoundException) {
@@ -267,7 +267,7 @@ export class BooksService {
             }));
 
         } catch (error) {
-            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
                 throw new NotFoundException(`El usuario con id ${id} no fue encontrado.`);
             }
             if (error instanceof NotFoundException) {
@@ -317,7 +317,7 @@ export class BooksService {
             }));
 
         } catch (error) {
-            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
                 throw new NotFoundException(`El usuario con id ${id} no fue encontrado.`);
             }
             if (error instanceof NotFoundException) {
@@ -374,7 +374,7 @@ export class BooksService {
             return result;
 
         } catch (error) {
-            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+            if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
                 throw new NotFoundException(`El usuario con id ${userId} no fue encontrado.`);
             }
 
