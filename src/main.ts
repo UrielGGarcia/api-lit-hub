@@ -8,8 +8,15 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Seguridad
-  app.use(helmet());
-
+  // Seguridad
+  app.use(
+    helmet({
+      // Permitir que otros orígenes (Vercel) usen tus recursos (imágenes)
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+      // Esto también suele romper cosas con recursos externos
+      crossOriginEmbedderPolicy: false,
+    }),
+  );
   // CORS
   app.enableCors({
     origin:
