@@ -2,21 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as express from 'express';
-import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Seguridad
-  // Seguridad
-  app.use(
-    helmet({
-      // Permitir que otros orígenes (Vercel) usen tus recursos (imágenes)
-      crossOriginResourcePolicy: { policy: 'cross-origin' },
-      // Esto también suele romper cosas con recursos externos
-      crossOriginEmbedderPolicy: false,
-    }),
-  );
+ 
   // CORS
   app.enableCors({
     origin:
